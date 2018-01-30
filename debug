@@ -1,0 +1,57 @@
+#!/bin/bash
+export PATH=$PATH:$PWD/core/gcc-arm-none-eabi-6-2017-q2-update/bin
+
+if [ $# == 0 ]; then
+    if [ -d _builds/Debug ]; then
+        echo "You are keepping to debug at last time!"
+    else
+        echo "Hello friends, my name is DoST, Welcome to enjoy to debug of ST ^_^"
+        echo "As firt debug project, you need  to tell me ID about ST product"
+        echo "Example: STM32F407ZGT6"
+        read -p "Input ST's product ID: (Enter, STM32F407ZGT6 is a default select)" ST_ID
+
+        if [ -z $ST_ID ]; then
+            echo "You need to input ST's product identification, we have detect that you type Enter,so, STM32F407ZGT6 wil be choice"
+            ST_ID=STM32F407ZGT6
+        fi
+
+        cmake -C.dost.conf/dost_system_config.cmake -H. -B_builds/Debug -G "Unix Makefiles" -DSTM32_CHIP=$ST_ID -DCMAKE_BUILD_TYPE=Debug -DSHOW_CORE_MESSAGE=TRUE
+    fi
+elif [ $# == 1 ]; then
+    if [ $1 == "-r" ]; then
+        rm -rf _builds/Debug
+        echo "Hello friends, my name is DoST, Welcome to enjoy to debug of ST ^_^"
+        echo "As firt debug project, you need  to tell me ID about ST product"
+        echo "Example: STM32F407ZGT6"
+        read -p "Input ST's product ID: (Enter, STM32F407ZGT6 is a default select)" ST_ID
+
+        if [ -z $ST_ID ]; then
+            echo "You need to input ST's product identification, we have detect that you type Enter,so, STM32F407ZGT6 wil be choice"
+            ST_ID=STM32F407ZGT6
+        fi
+
+        cmake -C.dost.conf/dost_system_config.cmake -H. -B_builds/Debug -G "Unix Makefiles" -DSTM32_CHIP=$ST_ID -DCMAKE_BUILD_TYPE=Debug -DSHOW_CORE_MESSAGE=TRUE
+    else
+        echo "invalvid parament" && exit 0
+    fi
+else
+    echo "illegal parament list!" && exit 0
+fi
+
+make -C _builds/Debug
+
+stlink_sta=`which st-util` 
+
+if [ ! -z $stlink_sta ]; then
+    echo "DoST detect that stlink has installed, you can enjoy it!"
+else
+    echo "DoST detect that stlink is miss, and you must install it at first!" && exit 0
+fi
+
+st-util&
+
+make -C _builds/Debug STM32F407ZGT6.debug
+
+kill -9 `pidof "st-util"` 
+
+exit 0

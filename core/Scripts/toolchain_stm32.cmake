@@ -1,0 +1,57 @@
+#-------------------------------------------------------------------------------------------------
+# 配置交叉编译工具的路径
+#-------------------------------------------------------------------------------------------------
+if(NOT TARGET_TRIPLET)
+    set(CROSS_TARGET_TRIPLET "arm-none-eabi")
+    message(STATUS "No CROSS_TARGET_TRIPLET specified, using default: " ${CROSS_TARGET_TRIPLET})
+endif()
+
+set(CROSS_TOOLCHAIN_BIN_DIR "${CROSS_TOOLCHAIN_PREFIX}/bin")
+# set(CROSS_TOOLCHAIN_INC_DIR "${CROSS_TOOLCHAIN_PREFIX}/${CROSS_TARGET_TRIPLET}/include")
+# set(CROSS_TOOLCHAIN_LIB_DIR "${CROSS_TOOLCHAIN_PREFIX}/${CROSS_TARGET_TRIPLET}/lib")
+
+#-------------------------------------------------------------------------------------------------
+# 配置交叉编译环境
+#-------------------------------------------------------------------------------------------------
+set(CMAKE_SYSTEM_NAME Generic)
+set(CMAKE_SYSTEM_PROCESSOR arm)
+
+if(WIN32)
+    set(TOOL_EXECUTABLE_SUFFIX ".exe")
+else()
+    set(TOOL_EXECUTABLE_SUFFIX "")
+endif()
+
+if(${CMAKE_VERSION} VERSION_LESS 3.6.0)
+    include(CMakeForceCompiler)
+    CMAKE_FORCE_C_COMPILER("${CROSS_TOOLCHAIN_BIN_DIR}/${CROSS_TARGET_TRIPLET}-gcc${TOOL_EXECUTABLE_SUFFIX}" GNU)
+    CMAKE_FORCE_CXX_COMPILER("${CROSS_TOOLCHAIN_BIN_DIR}/${CROSS_TARGET_TRIPLET}-g++${TOOL_EXECUTABLE_SUFFIX}" GNU)
+else()
+    set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
+    set(CMAKE_C_COMPILER "${CROSS_TOOLCHAIN_BIN_DIR}/${CROSS_TARGET_TRIPLET}-gcc${TOOL_EXECUTABLE_SUFFIX}")
+    set(CMAKE_CXX_COMPILER "${CROSS_TOOLCHAIN_BIN_DIR}/${CROSS_TARGET_TRIPLET}-g++${TOOL_EXECUTABLE_SUFFIX}")
+endif()
+
+set(CMAKE_ASM_COMPILER "${CROSS_TOOLCHAIN_BIN_DIR}/${CROSS_TARGET_TRIPLET}-gcc${TOOL_EXECUTABLE_SUFFIX}")
+
+set(CMAKE_OBJCOPY "${CROSS_TOOLCHAIN_BIN_DIR}/${CROSS_TARGET_TRIPLET}-objcopy${TOOL_EXECUTABLE_SUFFIX}" CACHE INTERNAL "objcopy tool")
+set(CMAKE_OBJDUMP "${CROSS_TOOLCHAIN_BIN_DIR}/${CROSS_TARGET_TRIPLET}-objdump${TOOL_EXECUTABLE_SUFFIX}" CACHE INTERNAL "objdump tool")
+set(CMAKE_SIZE "${CROSS_TOOLCHAIN_BIN_DIR}/${CROSS_TARGET_TRIPLET}-size${TOOL_EXECUTABLE_SUFFIX}" CACHE INTERNAL "size tool")
+set(CMAKE_DEBUGER "${CROSS_TOOLCHAIN_BIN_DIR}/${CROSS_TARGET_TRIPLET}-gdb${TOOL_EXECUTABLE_SUFFIX}" CACHE INTERNAL "debuger")
+set(CMAKE_CPPFILT "${CROSS_TOOLCHAIN_BIN_DIR}/${CROSS_TARGET_TRIPLET}-c++filt${TOOL_EXECUTABLE_SUFFIX}" CACHE INTERNAL "C++filt")
+
+set(CMAKE_C_FLAGS_RELEASE "-Os -flto" CACHE INTERNAL "c compiler flags release")
+set(CMAKE_CXX_FLAGS_RELEASE "-Os -flto" CACHE INTERNAL "cxx compiler flags release")
+set(CMAKE_ASM_FLAGS_RELEASE "" CACHE INTERNAL "asm compiler flags release")
+set(CMAKE_EXE_LINKER_FLAGS_RELEASE "-flto" CACHE INTERNAL "linker flags release")
+
+set(CMAKE_C_FLAGS_DEBUG "-Og -g" CACHE INTERNAL "c compiler flags debug")
+set(CMAKE_CXX_FLAGS_DEBUG "-Og -g" CACHE INTERNAL "cxx compiler flags debug")
+set(CMAKE_ASM_FLAGS_DEBUG "-g" CACHE INTERNAL "asm compiler flags debug")
+set(CMAKE_EXE_LINKER_FLAGS_DEBUG "" CACHE INTERNAL "linker flags debug")
+
+# set(CMAKE_FIND_ROOT_PATH "${CROSS_TOOLCHAIN_PREFIX} ${CROSS_TOOLCHAIN_PREFIX}/${CROSS_TARGET_TRIPLET}" ${EXTRA_FIND_PATH})
+# set(CMAKE_FIND_ROOT_PATH "")
+# set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
+# set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
+# set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)

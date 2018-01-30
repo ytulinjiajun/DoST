@@ -1,0 +1,47 @@
+#!/bin/bash
+export PATH=$PATH:$PWD/core/gcc-arm-none-eabi-6-2017-q2-update/bin
+
+if [ $# == 0 ]; then
+    if [ -d _builds/Release ]; then
+        echo "You are keepping to compile at last time!"
+    else
+        echo "Hello friends, my name is DoST, Welcome to enjoy to debug of ST ^_^"
+        echo "As firt compile project, you need  to tell me ID about ST product"
+        echo "Example: STM32F407ZGT6"
+        read -p "Input ST's product ID: (Enter, STM32F407ZGT6 is a default select)" ST_ID
+
+        if [ -z $ST_ID ]; then
+            echo "You need to input ST's product identification, we have detect that you type Enter,so, STM32F407ZGT6 wil be choice"
+            ST_ID=STM32F407ZGT6
+        fi
+        cmake -C.dost.conf/dost_system_config.cmake -H. -B_builds/Release -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release -DSTM32_CHIP=$ST_ID -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DSHOW_CORE_MESSAGE=TRUE
+    fi
+elif [ $# == 1 ]; then
+    if [ $1 == "-r" ]; then
+        rm -rf _builds/Release
+        echo "Hello friends, my name is DoST, Welcome to enjoy to compile of ST ^_^"
+        echo "As firt compile project, you need  to tell me ID about ST product"
+        echo "Example: STM32F407ZGT6"
+        read -p "Input ST's product ID: (Enter, STM32F407ZGT6 is a default select)" ST_ID
+
+        if [ -z $ST_ID ]; then
+            echo "You need to input ST's product identification, we have detect that you type Enter,so, STM32F407ZGT6 wil be choice"
+            ST_ID=STM32F407ZGT6
+        fi
+        cmake -C.dost.conf/dost_system_config.cmake -H. -B_builds/Release -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release -DSTM32_CHIP=$ST_ID -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DSHOW_CORE_MESSAGE=TRUE
+
+        rc -J $PWD/_builds/Release/compile_commands.json
+    else
+        echo "invalid param" && exit 0
+    fi
+else
+    echo "illegal parament list!" && exit 0
+fi
+
+make -C _builds/Release
+
+make -C _builds/Release $ST_ID.bin
+
+make -C _builds/Release $ST_ID.hex
+
+exit 0

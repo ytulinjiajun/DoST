@@ -1,0 +1,8 @@
+[Unit]
+Description=RTags daemon
+
+Requires=rdm.socketp
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/rdm --log-file=%h/.rtags/rdm.log --data-dir=%h/.rtags/rtags-cache --verbose --inactivity-timeout 300

@@ -1,0 +1,5 @@
+#!/bin/sh
+
+cd _builds/Release/bin
+
+st-flash write STM32F407ZGT6.bin 0x08000000

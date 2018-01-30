@@ -1,0 +1,9 @@
+#!/bin/bash
+systemd_dir=$HOME/.config/systemd/user
+mkdir -p $systemd_dir
+
+less rdm.socket > $systemd_dir/rdm.socket
+less rdm.service > $systemd_dir/rdm.service
+
+systemctl --user enable rdm.socket
+systemctl --user start rdm.socket
